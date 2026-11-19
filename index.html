@@ -255,7 +255,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,su
       <div class="list" id="docList" style="margin-top:12px"></div>
       <div class="actions">
         <button class="btn" type="button" id="copyDocs" style="background:#0068ff;border-color:#0068ff;color:#fff">Nhờ chuyên viên rà &amp; gửi danh sách đầy đủ qua Zalo</button>
-      <p style="margin:8px 0 0;font-size:14px;color:#5b6577">Tích vào những giấy tờ bạn đã có, rồi bấm nút: yêu cầu sẽ được chép sẵn, Zalo tự mở — bạn chỉ cần <b>dán và gửi</b>. Chuyên viên sẽ rà và gửi lại danh sách đúng với hồ sơ của bạn.</p>
+      <p style="margin:8px 0 0;font-size:14px;color:#5b6577">Tích vào những giấy tờ bạn đã có, rồi bấm nút: yêu cầu sẽ được chép sẵn, bạn bấm <b>Mở Zalo</b> rồi <b>dán và gửi</b>. Chuyên viên sẽ rà và gửi lại danh sách đúng với hồ sơ của bạn.</p>
       </div>
     </div>
   </section>
@@ -875,9 +875,37 @@ $("#copyDocs").onclick = async () => {
   if(have.length){ t.push("", "Giấy tờ em đã có:"); t.push(...have); }
   else t.push("Em chưa rõ mình đã đủ giấy tờ gì.");
   t.push("", "Nhờ anh/chị rà giúp và gửi em danh sách giấy tờ đầy đủ theo đúng hồ sơ của em.");
-  await copy(t.join("\n"));
-  const z = zaloLink(); if(z) setTimeout(()=>window.open(z,"_blank","noopener"), 600);
+  const msg = t.join("\n");
+  await copy(msg);
+  showZaloSend(msg);
 };
+function showZaloSend(msg){
+  let m = document.getElementById("zsend");
+  if(!m){
+    m = document.createElement("div"); m.id = "zsend";
+    m.setAttribute("role","dialog"); m.setAttribute("aria-modal","true");
+    m.style.cssText = "position:fixed;inset:0;z-index:80;background:rgba(15,27,42,.55);display:flex;align-items:center;justify-content:center;padding:16px";
+    m.innerHTML = `<div style="background:#fff;color:#1b2a44;border-radius:16px;max-width:460px;width:100%;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,.3)">
+      <h3 style="margin:0 0 6px;font-size:19px">Gửi yêu cầu qua Zalo</h3>
+      <p style="margin:0 0 10px;font-size:14px;color:#5b6577">Lời nhắn bên dưới <b>đã được chép sẵn</b>. Zalo không tự điền tin nhắn, nên bạn làm 2 bước:</p>
+      <ol style="margin:0 0 10px;padding-left:20px;font-size:15px;line-height:1.6">
+        <li>Bấm <b>Mở Zalo</b> bên dưới.</li>
+        <li>Trong khung chat: <b>nhấn giữ → Dán</b> (điện thoại) hoặc <b>Ctrl+V</b> (máy tính), rồi bấm <b>Gửi</b>.</li>
+      </ol>
+      <textarea id="zsendTxt" readonly style="width:100%;height:130px;font:14px/1.5 inherit;font-family:inherit;border:1px solid #d8e2ee;border-radius:10px;padding:10px;background:#f4f8fd;color:#1b2a44"></textarea>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        <a id="zsendGo" target="_blank" rel="noopener" style="flex:1;min-width:150px;display:inline-flex;align-items:center;justify-content:center;min-height:48px;border-radius:10px;background:#0068ff;color:#fff;font-weight:700;text-decoration:none">Mở Zalo</a>
+        <button type="button" id="zsendCopy" style="min-height:48px;padding:0 14px;border-radius:10px;border:1px solid #0068ff;background:#fff;color:#0068ff;font:700 15px inherit;font-family:inherit;cursor:pointer">Chép lại</button>
+        <button type="button" id="zsendClose" style="min-height:48px;padding:0 14px;border-radius:10px;border:1px solid #d8e2ee;background:#fff;color:#5b6577;font:600 15px inherit;font-family:inherit;cursor:pointer">Đóng</button>
+      </div></div>`;
+    document.body.appendChild(m);
+    m.addEventListener("click", e=>{ if(e.target===m) m.remove(); });
+    m.querySelector("#zsendClose").onclick = ()=>m.remove();
+    m.querySelector("#zsendCopy").onclick = ()=>copy(m.querySelector("#zsendTxt").value);
+  }
+  m.querySelector("#zsendTxt").value = msg;
+  m.querySelector("#zsendGo").href = zaloLink();
+}
 
 /* ---------- Hỏi đáp ---------- */
 const FAQ = [
