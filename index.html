@@ -431,8 +431,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,su
     <div class="card">
       <h2>Trường hợp của bạn phức tạp hơn?</h2>
       <p style="margin:0 0 4px;max-width:60ch">Thừa kế nhiều đời, tài sản chung chưa chia, người ở nước ngoài, đất chưa có sổ, tranh chấp… cần xem giấy tờ cụ thể.</p>
-      <p style="margin:8px 0 4px">Nếu bạn còn thắc mắc, hãy liên hệ tại đây:</p>
-      <div class="actions" id="ctaFaq"></div>
+      <p style="margin:8px 0 4px">Nếu bạn còn thắc mắc, bấm nút <b>Nhắn Zalo</b> ở góc dưới màn hình để được trao đổi trực tiếp.</p>
     </div>
   </section>
 
@@ -800,9 +799,7 @@ function render(){
     <div class="split">${Object.entries(r.whoSum).map(([k,v])=>`<div><span>${k}</span><b>${fmt(v)}</b></div>`).join("")}</div>
     <table class="items"><tbody>${r.items.map(i=>`<tr><td>${i.label}${i.free?'<span class="pill free">Miễn</span>':""}<span class="pill who">${i.who}</span><span class="why">${i.why}</span></td><td class="v">${i.free?"0 đ":fmt(i.amount)}</td></tr>`).join("")}</tbody></table>
     ${r.notes.length?`<div class="notes">${r.notes.map(n=>`<div class="note ${n.k==="good"?"good":""}">${n.m}</div>`).join("")}</div>`:""}
-    <div class="actions">
-      ${ctaHTML()}
-    </div>`;
+`;
 }
 function quoteText(r){
   const L = [];
