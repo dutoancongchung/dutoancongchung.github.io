@@ -254,7 +254,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,su
       </label>
       <div class="list" id="docList" style="margin-top:12px"></div>
       <div class="actions">
-        <button class="btn" type="button" id="copyDocs">Sao chép danh sách gửi khách</button>
+        <button class="btn" type="button" id="copyDocs" style="background:#0068ff;border-color:#0068ff;color:#fff">Nhờ chuyên viên rà &amp; gửi danh sách đầy đủ qua Zalo</button>
+      <p style="margin:8px 0 0;font-size:14px;color:#5b6577">Tích vào những giấy tờ bạn đã có, rồi bấm nút: yêu cầu sẽ được chép sẵn, Zalo tự mở — bạn chỉ cần <b>dán và gửi</b>. Chuyên viên sẽ rà và gửi lại danh sách đúng với hồ sơ của bạn.</p>
       </div>
     </div>
   </section>
@@ -592,7 +593,7 @@ function words(n){
 }
 function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("on"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("on"),2200); }
 async function copy(text){
-  try{ await navigator.clipboard.writeText(text); toast("Đã sao chép — dán vào Zalo để gửi khách"); }
+  try{ await navigator.clipboard.writeText(text); toast("Đã chép yêu cầu — dán vào Zalo và bấm gửi"); }
   catch(e){
     const ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta); ta.select();
     let ok=false; try{ ok=document.execCommand("copy"); }catch(_){}
@@ -866,12 +867,16 @@ function renderDocs(){
 }
 $("#docType").innerHTML = Object.entries(DOCS).map(([k,d])=>`<option value="${k}">${d.t}</option>`).join("");
 $("#docType").addEventListener("change", renderDocs);
-$("#copyDocs").onclick = () => {
+$("#copyDocs").onclick = async () => {
   const d = DOCS[$("#docType").value];
-  const t = ["📂 GIẤY TỜ CẦN CHUẨN BỊ – "+d.t.toUpperCase(), ""].concat(d.g.flatMap(([h,arr])=>[h+":"].concat(arr.map(x=>"☐ "+x)).concat([""])));
-  t.push("Vui lòng mang bản chính khi đến ký. Tùy hồ sơ, công chứng viên có thể yêu cầu bổ sung.");
-  if(S.name||S.phone) t.push("Hỗ trợ: "+[S.name,S.phone?("Zalo "+S.phone):""].filter(Boolean).join(" – "));
-  copy(t.join("\n"));
+  const boxes = [...document.querySelectorAll("#docList label.chk")];
+  const have = boxes.filter(b=>b.querySelector("input").checked).map(b=>"✔ "+b.textContent.trim());
+  const t = ["Chào anh/chị, em cần hỗ trợ chuẩn bị hồ sơ: "+d.t+"."];
+  if(have.length){ t.push("", "Giấy tờ em đã có:"); t.push(...have); }
+  else t.push("Em chưa rõ mình đã đủ giấy tờ gì.");
+  t.push("", "Nhờ anh/chị rà giúp và gửi em danh sách giấy tờ đầy đủ theo đúng hồ sơ của em.");
+  await copy(t.join("\n"));
+  const z = zaloLink(); if(z) setTimeout(()=>window.open(z,"_blank","noopener"), 600);
 };
 
 /* ---------- Hỏi đáp ---------- */
